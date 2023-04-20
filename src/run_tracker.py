@@ -4,7 +4,7 @@ from typing import Tuple
 import cv2
 
 from src.sequence_utils import VOTSequence
-from particle_tracker import ParticleParams, ParticleTracker
+from src.particle_tracker import ParticleParams, ParticleTracker
 #from ms_tracker import MeanShiftTracker, MSParams
 
 def run_tracker(dataset_path: str, sequence: str,
@@ -59,6 +59,7 @@ def run_tracker(dataset_path: str, sequence: str,
         if show_gt:
             sequence.draw_region(img, gt_bb, (0, 255, 0), 1)
         sequence.draw_region(img, predicted_bbox, (0, 0, 255), 2)
+        sequence.draw_points(img, tracker.particles, tracker.normalized_weights)
         sequence.draw_text(img, '%d/%d' % (frame_idx + 1, sequence.length()), (25, 25))
         sequence.draw_text(img, 'Fails: %d' % n_failures, (25, 55))
         sequence.show_image(img, video_delay)

@@ -96,6 +96,10 @@ class VOTSequence():
             print('Error: Unknown region format.')
             exit(-1)
 
+    def draw_points(self, img, points, weights):
+        for i, point in enumerate(points):
+            cv2.circle(img, (round(point[0]), round(point[1])), radius=round(10*(weights[i])), color=(0, 255, 0), thickness=-1)
+
     def draw_text(self, img, text, text_pos):
         font = cv2.FONT_HERSHEY_PLAIN
         text_sz = cv2.getTextSize(text, font, 1, 1)
