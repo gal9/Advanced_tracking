@@ -1,7 +1,7 @@
 import numpy as np
 import sympy as sp
 
-from .ex4_utils import kalman_step
+from src.ex4_utils import kalman_step
 
 def get_system_matrices(model: str, q: float, r: float, timestep: float = 1,
                         to_numpy: bool = True) -> tuple[np.array, np.array, np.array]:

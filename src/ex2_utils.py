@@ -5,8 +5,8 @@ import cv2
 
 def get_patch(img, center, sz):
     # crop coordinates
-    x0 = round(int(center[0] - (sz[0]-1) / 2))
-    y0 = round(int(center[1] - (sz[1]-1) / 2))
+    x0 = round(int(center[0] - (sz[0]) / 2))
+    y0 = round(int(center[1] - (sz[1]) / 2))
     x1 = int(round(x0 + sz[0]))
     y1 = int(round(y0 + sz[1]))
     # padding
@@ -71,7 +71,6 @@ def backproject_histogram(patch, histogram, nbins):
     backprojection = np.reshape(histogram[bin_idxs.flatten()], (patch.shape[0], patch.shape[1]))
     return backprojection
 
-# base class for tracker
 class Tracker():
     def __init__(self, params):
         self.parameters = params
