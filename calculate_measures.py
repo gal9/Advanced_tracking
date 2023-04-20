@@ -6,7 +6,7 @@ from src.io_utils import read_regions, read_vector
 from src.export_utils import export_measures
 
 
-def tracking_analysis(workspace_path, tracker_id):
+def tracking_analysis(workspace_path, tracker_id, sensitivity):
 
     dataset = load_dataset(workspace_path)
 
@@ -40,7 +40,7 @@ def tracking_analysis(workspace_path, tracker_id):
         per_seq_failures[i] = failures
         per_seq_time[i] = t
     
-    return export_measures(workspace_path, dataset, tracker, per_seq_overlaps, per_seq_failures, per_seq_time)
+    return export_measures(workspace_path, dataset, tracker, per_seq_overlaps, per_seq_failures, per_seq_time, sensitivity)
 
 
 def main():

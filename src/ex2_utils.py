@@ -14,7 +14,6 @@ def get_patch(img, center, sz):
     x1_pad = max(x1 - img.shape[1] + 1, 0)
     y0_pad = max(0, -y0)
     y1_pad = max(y1 - img.shape[0] + 1, 0)
-
     # Crop target
     if len(img.shape) > 2:
         img_crop = img[y0 + y0_pad:y1 - y1_pad, x0 + x0_pad:x1 - x1_pad, :]
@@ -27,6 +26,13 @@ def get_patch(img, center, sz):
     m_ = np.ones((img.shape[0], img.shape[1]), dtype=np.float32)
     crop_mask = m_[y0 + y0_pad:y1 - y1_pad, x0 + x0_pad:x1 - x1_pad]
     crop_mask = cv2.copyMakeBorder(crop_mask, y0_pad, y1_pad, x0_pad, x1_pad, cv2.BORDER_CONSTANT, value=0)
+    
+    if((im_crop_padded.shape[1], im_crop_padded.shape[0]) != sz):
+        #breakpoint()
+        im_crop_padded = im_crop_padded[:sz[1], :sz[0]]
+        crop_mask = crop_mask[:sz[1], :sz[0]]
+        
+
     return im_crop_padded, crop_mask
 
 def create_epanechnik_kernel(width, height, sigma):

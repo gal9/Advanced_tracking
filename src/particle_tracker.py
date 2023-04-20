@@ -15,8 +15,8 @@ class ParticleParams():
                  q: float = 200,
                  r: float = 1,
                  histogram_update_alpha: float = 0.2,
-                 num_of_particles: int = 300,
-                 motion_model: str = "nearly_constant_velocity",
+                 num_of_particles: int = 50,
+                 motion_model: str = "nearly_constant_acceleration",
                  sigma_squared: float = 0.01):
         self.num_of_particles = num_of_particles
         self.motion_model = motion_model
@@ -38,7 +38,7 @@ class ParticleTracker(Tracker):
         #super().__init__()
 
     def name(self):
-        return "Particle_filter_tracker_kernel_05_particle_300_sigma_01_alpha_02"
+        return "Particle_filter_tracker_kernel_05_particle_50_sigma_01_alpha_02_NCA"
 
     def initialize(self, image, region):
 
@@ -71,22 +71,25 @@ class ParticleTracker(Tracker):
         self.Fi, self.Q, self.H, self.R = get_system_matrices(self.parameters.motion_model,
                                                               self.parameters.q,
                                                               self.parameters.r)
-
-        # Initialize particles
+        # Initialize visual mode (histogram)
         # Create kernel as it will be used always
         self.kernel = create_epanechnik_kernel(self.size[0],self.size[1],
                                                self.parameters.kernel_sigma)
         self.histogram = extract_histogram(patch, self.parameters.nbins, self.kernel)
         self.histogram = self._normalize_histogram(self.histogram)
-        self.particles = sample_gauss([self.position[0],self.position[1],0,0],
+
+        # Generate particles
+        if(self.parameters.motion_model == "random_walk"):
+            mu = [self.position[0],self.position[1]]
+        elif(self.parameters.motion_model == "nearly_constant_velocity"):
+            mu = [self.position[0],self.position[1],0,0]
+        elif(self.parameters.motion_model == "nearly_constant_acceleration"):
+            mu = [self.position[0],self.position[1],0,0,0,0]
+        self.particles = sample_gauss(mu,
                                         self.Q,
                                         self.parameters.num_of_particles)
-        # for point in self.particles:
-        # #     point[0] = round(point[0])
-        # #     point[1] = round(point[1])
-        #      point[2] = 0
-        #      point[3] = 0
-
+        
+        # Initialize weights
         self.weights = np.array([1]* self.parameters.num_of_particles)
         self.normalized_weights = self.weights/sum(self.weights)
 
@@ -129,7 +132,9 @@ class ParticleTracker(Tracker):
         for particle in self.particles:
             particle_patch, particle_mask = get_patch(image, (particle[0], particle[1]), self.size)
             if(particle_patch.shape != (self.size[1], self.size[0], 3)):
-                breakpoint()
+                #breakpoint()
+                pass
+            particle_patch, particle_mask = get_patch(image, (particle[0], particle[1]), self.size)
             # particle_mask = np.repeat(particle_mask.reshape((particle_mask.shape[0],
             #                                                  particle_mask.shape[1],
             #                                                  1)), 3, axis=2)
@@ -152,7 +157,7 @@ class ParticleTracker(Tracker):
     def _transform_particles(self, particles_new: np.array):
         transformed = []
 
-        noise = sample_gauss([0, 0, 0, 0], self.Q, self.parameters.num_of_particles)
+        noise = sample_gauss([0] *self.Q.shape[0], self.Q, self.parameters.num_of_particles)
 
         for particle in particles_new:
             transformed.append(self.Fi.dot(particle))

@@ -9,11 +9,13 @@ from src.tracker import Tracker
 from src.plot_styles import load_plot_styles
 
 
-def print_summary(output_dict):
+def print_summary(output_dict, sensitivity):
+    r = math.exp(- sensitivity * (float(output_dict['total_failures']) / float(output_dict['total_frames'])))
     print('------------------------------------')
     print('Results for tracker:', output_dict['tracker_name'])
     print('  Average overlap: %.2f' % output_dict['average_overlap'])
     print('  Total failures: %.1f' % output_dict['total_failures'])
+    print('  Robustness: %.3f' % r)
     print('  Average speed: %.2f FPS' % output_dict['average_speed'])
     print('------------------------------------')
 
@@ -46,7 +48,7 @@ def export_plot(outputs, sensitivity, output_path):
 
     print('The AR plot is saved to the file:', output_path)
 
-def export_measures(workspace_path: str, dataset: Dataset, tracker: Tracker, overlaps: list, failures: list, times: list):
+def export_measures(workspace_path: str, dataset: Dataset, tracker: Tracker, overlaps: list, failures: list, times: list, sensitivity):
     
     # create per-sequence output structure
     speed = len(dataset.sequences) * [0]
@@ -75,6 +77,6 @@ def export_measures(workspace_path: str, dataset: Dataset, tracker: Tracker, ove
     with open(file_path, 'w') as f:
         json.dump(output, f, indent=2)
 
-    print_summary(output)
+    print_summary(output, sensitivity)
 
     return output

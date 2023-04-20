@@ -19,9 +19,9 @@ def tracking_comparison(workspace_path, tracker_ids, sensitivity, output_path):
         results_path = os.path.join(workspace_path, 'analysis', tracker.name(), 'results.json')
         if os.path.exists(results_path):
             output = load_output(results_path)
-            print_summary(output)
+            print_summary(output, sensitivity)
         else:
-            output = tracking_analysis(workspace_path, tracker_id)
+            output = tracking_analysis(workspace_path, tracker_id, sensitivity)
         
         outputs_all.append(output)
 
